@@ -36,7 +36,8 @@ const resolverFn = async (
       email,
       bio,
       ...(uglyPassword && { password: uglyPassword }), // 이 부분 다시 복습
-      ...(avatarUrl && { avatar: avatarUrl }),
+      ...(avatarUrl && { avatar: avatarUrl }), 
+      // avatarUrl이 정의되어 있다면 avatar? avatarUrl?를 가진 object를 생성
     },
   });
 
