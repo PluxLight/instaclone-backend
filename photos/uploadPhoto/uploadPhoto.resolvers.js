@@ -1,5 +1,6 @@
 import client from "../../client";
 import { protectedResolver } from "../../users/users.utils";
+import { processHashtags } from "../photos.utils";
 
 export default {
   Mutation: {
@@ -7,34 +8,24 @@ export default {
       async (_, { file, caption }, { loggedInUser }) => {
         let hashtagObj = [];
         if (caption) {
-            // const hashtags = caption.match(/#[\w]+/g);
-            const hashtags = caption.match(/#[ㄱ-ㅎ|ㅏ-ㅣ|가-힣|\w]+/g);
-            hashtagObj = hashtags.map((hashtag) => ({
-                where: { hashtag },
-                create: { hashtag },
-              }));
-            // console.log(hashtags)
-          /// parse caption
-          // get or create Hashtags
+          hashtagObj = processHashtags(caption);
         }
-        // save the photo WITH the parsed hashtags
-        // add the photo to the hashtags
         return client.photo.create({
-            data: {
-              file,
-              caption,
-              user: {
-                connect: {
-                  id: loggedInUser.id,
-                },
+          data: {
+            file,
+            caption,
+            user: {
+              connect: {
+                id: loggedInUser.id,
               },
-              ...(hashtagObj.length > 0 && {
-                hashtags: {
-                  connectOrCreate: hashtagObj,
-                },
-              }),
             },
-          });
+            ...(hashtagObj.length > 0 && {
+              hashtags: {
+                connectOrCreate: hashtagObj,
+              },
+            }),
+          },
+        });
       }
     ),
   },
